@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather History - AmbientWeather</title>
+    <link rel="stylesheet" href="assets/app.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>📊 Weather History</h1>
+            <nav>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="history-controls">
+                <div class="control-group">
+                    <label for="stationSelect">Station:</label>
+                    <select id="stationSelect">
+                        <option value="">All Stations</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="metricSelect">Metric:</label>
+                    <select id="metricSelect">
+                        <option value="temp_f">Temperature (°F)</option>
+                        <option value="humidity">Humidity (%)</option>
+                        <option value="pressure_in">Pressure (inHg)</option>
+                        <option value="wind_mph">Wind Speed (mph)</option>
+                        <option value="wind_gust_mph">Wind Gust (mph)</option>
+                        <option value="wind_dir_deg">Wind Direction (°)</option>
+                        <option value="rain_hour_in">Rain/Hour (in)</option>
+                        <option value="rain_daily_in">Rain/Daily (in)</option>
+                        <option value="uv">UV Index</option>
+                        <option value="solar_radiation">Solar Radiation</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="dateRange">Date Range:</label>
+                    <input type="text" id="dateRange" placeholder="Select date range">
+                </div>
+
+                <div class="control-group">
+                    <label for="downsampleSelect">Aggregation:</label>
+                    <select id="downsampleSelect">
+                        <option value="none">Raw Data</option>
+                        <option value="daily">Daily Average</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <button id="updateChart" class="btn btn-primary">Update Chart</button>
+                    <button id="exportCSV" class="btn btn-secondary">Export CSV</button>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="weatherChart"></canvas>
+            </div>
+
+            <div class="data-table-container">
+                <h3>Data Table</h3>
+                <div class="table-controls">
+                    <span id="dataCount">0 data points</span>
+                </div>
+                <div class="table-wrapper">
+                    <table id="dataTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th id="metricHeader">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>AmbientWeather Viewer & Archiver</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="assets/app.js"></script>
+</body>
+</html>

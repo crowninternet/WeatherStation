@@ -1,0 +1,30 @@
+{
+  "name": "ambientweather-viewer",
+  "version": "1.0.0",
+  "description": "AmbientWeather Viewer & Archiver - displays current conditions and historical charts",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "ingest": "node scripts/ingest.js"
+  },
+  "keywords": ["weather", "ambientweather", "dashboard", "charts"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1",
+    "node-fetch": "^3.3.2",
+    "dayjs": "^1.11.10"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+
+
+
+

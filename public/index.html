@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmbientWeather Dashboard</title>
+    <link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🌤️ AmbientWeather Dashboard</h1>
+            <nav>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="dashboard-header">
+                <h2>Current Conditions</h2>
+                <div style="display:flex; align-items:center; gap: 0.75rem;">
+                    <div class="last-updated">
+                        Last updated: <span id="lastUpdated">Loading...</span>
+                    </div>
+                    <button id="refreshDashboard" class="btn btn-secondary" title="Refresh data now">Refresh</button>
+                </div>
+            </div>
+
+            <div id="stationsGrid" class="stations-grid">
+                <div class="loading">Loading stations...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>AmbientWeather Viewer & Archiver</p>
+        </div>
+    </footer>
+
+    <!-- Modal for metric history -->
+    <div id="metricModal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop" id="modalBackdrop"></div>
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal-header" style="gap: 0.5rem;">
+                <h3 id="modalTitle" style="flex:1;">Metric History</h3>
+                <button id="modalCompare" class="btn btn-primary" aria-label="Compare">Compare</button>
+                <button id="modalClose" class="btn btn-secondary" aria-label="Close">Close</button>
+            </div>
+            <div class="modal-body">
+                <canvas id="modalChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="assets/app.js?v=20250924-fixed"></script>
+</body>
+</html>
