@@ -1,0 +1,23 @@
+# Environment variables
+.env
+
+# Node.js dependencies
+node_modules/
+
+# Logs
+*.log
+server.log
+
+# Runtime data
+data/data.json
+
+# macOS
+.DS_Store
+
+# IDE files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
