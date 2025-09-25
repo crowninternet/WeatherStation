@@ -17,10 +17,10 @@ This guide will help you deploy the Weather Station app on port 80 in a cPanel e
 
 ### 1.2 Configure Account Settings
 ```
-Domain: weatherstation.yourdomain.com
+Domain: weatherstation.com
 Username: weatheruser
 Password: [strong password]
-Email: admin@yourdomain.com
+Email: admin@weatherstation.com
 Package: [select appropriate package]
 ```
 
@@ -245,7 +245,7 @@ sudo systemctl start weatherstation.service
 # Create Apache virtual host configuration
 sudo cat > /etc/httpd/conf.d/weatherstation.conf << 'EOF'
 <VirtualHost *:80>
-    ServerName weatherstation.yourdomain.com
+    ServerName weatherstation.com
     DocumentRoot /home/weatheruser/public_html/public
     
     # Proxy to Node.js app running on port 3000
@@ -293,7 +293,7 @@ sudo apt install -y certbot python3-certbot-apache
 ### 6.2 Obtain SSL Certificate
 ```bash
 # Get SSL certificate
-sudo certbot --apache -d weatherstation.yourdomain.com
+sudo certbot --apache -d weatherstation.com
 
 # Auto-renewal setup
 sudo crontab -e
@@ -330,7 +330,7 @@ chmod 755 /home/weatheruser/public_html/start-server.sh
 sudo systemctl status weatherstation.service
 
 # Check if app is responding
-curl http://weatherstation.yourdomain.com/health
+curl http://weatherstation.com/health
 
 # Check logs
 tail -f /home/weatheruser/public_html/server.log
@@ -339,7 +339,7 @@ tail -f /home/weatheruser/public_html/server.log
 ### 8.2 Test Data Ingestion
 ```bash
 # Test manual data ingestion
-curl "http://weatherstation.yourdomain.com/tasks/ingest?token=YOUR_ADMIN_TOKEN"
+curl "http://weatherstation.com/tasks/ingest?token=YOUR_ADMIN_TOKEN"
 ```
 
 ## Step 9: Monitoring and Maintenance
@@ -370,7 +370,7 @@ cat > /home/weatheruser/public_html/monitor.sh << 'EOF'
 #!/bin/bash
 
 # Simple health check script
-HEALTH_URL="http://weatherstation.yourdomain.com/health"
+HEALTH_URL="http://weatherstation.com/health"
 LOG_FILE="/home/weatheruser/public_html/monitor.log"
 
 if curl -f -s "$HEALTH_URL" > /dev/null; then
@@ -440,14 +440,14 @@ lsof -i :80
 ### 11.1 Update DNS Records
 Ensure your domain's DNS records point to your server:
 ```
-A Record: weatherstation.yourdomain.com → YOUR_SERVER_IP
+A Record: weatherstation.com → YOUR_SERVER_IP
 ```
 
 ### 11.2 Test Complete Setup
-1. Visit `http://weatherstation.yourdomain.com`
-2. Check health endpoint: `http://weatherstation.yourdomain.com/health`
-3. Test data ingestion: `http://weatherstation.yourdomain.com/tasks/ingest?token=YOUR_TOKEN`
-4. Verify SSL: `https://weatherstation.yourdomain.com`
+1. Visit `http://weatherstation.com`
+2. Check health endpoint: `http://weatherstation.com/health`
+3. Test data ingestion: `http://weatherstation.com/tasks/ingest?token=YOUR_TOKEN`
+4. Verify SSL: `https://weatherstation.com`
 
 ## Security Considerations
 

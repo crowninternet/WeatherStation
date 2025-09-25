@@ -7,7 +7,7 @@ set -e
 
 # Configuration variables
 CPANEL_USER="${1:-weatheruser}"
-CPANEL_DOMAIN="${2:-weatherstation.yourdomain.com}"
+CPANEL_DOMAIN="${2:-weatherstation.com}"
 APP_DIR="/home/$CPANEL_USER/public_html"
 NODE_PORT="${3:-80}"
 
@@ -283,7 +283,7 @@ cat > "$APP_DIR/monitor.sh" << 'EOF'
 #!/bin/bash
 
 # Simple health check script
-HEALTH_URL="http://localhost:80/health"
+HEALTH_URL="http://weatherstation.com/health"
 LOG_FILE="/home/weatheruser/public_html/monitor.log"
 
 if curl -f -s "$HEALTH_URL" > /dev/null; then

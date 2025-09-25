@@ -9,14 +9,14 @@
 ## Quick Setup (Automated)
 
 ### 1. Create cPanel Account via WHM
-- Domain: `weatherstation.yourdomain.com`
+- Domain: `weatherstation.com`
 - Username: `weatheruser`
 - Package: Select appropriate package
 
 ### 2. Run Deployment Script
 ```bash
 # Download and run the deployment script
-sudo ./deploy-cpanel.sh weatheruser weatherstation.yourdomain.com 80
+sudo ./deploy-cpanel.sh weatheruser weatherstation.com 80
 ```
 
 ### 3. Upload Application Files
@@ -118,7 +118,7 @@ EOF
 ```bash
 sudo cat > /etc/httpd/conf.d/weatherstation.conf << 'EOF'
 <VirtualHost *:80>
-    ServerName weatherstation.yourdomain.com
+    ServerName weatherstation.com
     DocumentRoot /home/weatheruser/public_html/public
     
     ProxyPreserveHost On
@@ -171,10 +171,10 @@ lsof -i :80
 
 ```bash
 # Health check
-curl http://weatherstation.yourdomain.com/health
+curl http://weatherstation.com/health
 
 # Test data ingestion
-curl "http://weatherstation.yourdomain.com/tasks/ingest?token=YOUR_ADMIN_TOKEN"
+curl "http://weatherstation.com/tasks/ingest?token=YOUR_ADMIN_TOKEN"
 
 # Check service status
 sudo systemctl status weatherstation.service
@@ -188,7 +188,7 @@ sudo yum install -y certbot python3-certbot-apache  # CentOS/RHEL
 sudo apt install -y certbot python3-certbot-apache  # Ubuntu/Debian
 
 # Get SSL certificate
-sudo certbot --apache -d weatherstation.yourdomain.com
+sudo certbot --apache -d weatherstation.com
 
 # Auto-renewal
 sudo crontab -e
@@ -261,10 +261,10 @@ sudo journalctl -u weatherstation.service --since "1 hour ago"
 
 ## URLs
 
-- **Main App**: http://weatherstation.yourdomain.com
-- **Health Check**: http://weatherstation.yourdomain.com/health
-- **API**: http://weatherstation.yourdomain.com/api/stations
-- **Data Ingestion**: http://weatherstation.yourdomain.com/tasks/ingest?token=YOUR_TOKEN
+- **Main App**: http://weatherstation.com
+- **Health Check**: http://weatherstation.com/health
+- **API**: http://weatherstation.com/api/stations
+- **Data Ingestion**: http://weatherstation.com/tasks/ingest?token=YOUR_TOKEN
 
 ## File Locations
 
