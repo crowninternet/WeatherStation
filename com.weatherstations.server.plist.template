@@ -6,19 +6,20 @@
     <string>com.weatherstations.server</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/local/bin/node</string>
-        <string>/Users/administrator/Documents/WeatherStations/server.js</string>
+        <string>/bin/bash</string>
+        <string>REPLACE_WITH_YOUR_PROJECT_PATH/start-server.sh</string>
+        <string>monitor</string>
     </array>
     <key>WorkingDirectory</key>
-    <string>/Users/administrator/Documents/WeatherStations</string>
+    <string>REPLACE_WITH_YOUR_PROJECT_PATH</string>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
-    <string>/Users/administrator/Documents/WeatherStations/server.log</string>
+    <string>REPLACE_WITH_YOUR_PROJECT_PATH/server.log</string>
     <key>StandardErrorPath</key>
-    <string>/Users/administrator/Documents/WeatherStations/server.log</string>
+    <string>REPLACE_WITH_YOUR_PROJECT_PATH/server.log</string>
     <key>EnvironmentVariables</key>
     <dict>
         <key>NODE_ENV</key>
@@ -26,6 +27,3 @@
     </dict>
 </dict>
 </plist>
-
-
-

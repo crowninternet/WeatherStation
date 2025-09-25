@@ -10,6 +10,29 @@ const { router: taskRoutes, performIngestion } = require('./app/routes/tasks');
 const app = express();
 const PORT = process.env.PORT || 3333;
 
+// Global error handlers for uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  console.error('Stack:', error.stack);
+  // Don't exit immediately, log and continue
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  // Don't exit immediately, log and continue
+});
+
+// Keep process alive
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  process.exit(0);
+});
+
 // Log environment configuration (mask secrets)
 console.log('=== AmbientWeather Viewer Starting ===');
 console.log(`Port: ${PORT}`);
@@ -92,21 +115,65 @@ app.use((error, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// Start server
+// Start server with better error handling
 async function startServer() {
-  await initializeApp();
-  
-  app.listen(PORT, () => {
-    console.log('=== Server Started ===');
-    console.log(`🌐 Dashboard: http://localhost:${PORT}`);
-    console.log(`📊 History: http://localhost:${PORT}/history`);
-    console.log(`🔧 API: http://localhost:${PORT}/api/stations`);
-    console.log(`⚡ Ingest: http://localhost:${PORT}/tasks/ingest?token=YOUR_TOKEN`);
-    console.log('========================');
+  try {
+    await initializeApp();
     
-    // Start automatic data refresh every 5 minutes
-    startAutomaticRefresh();
-  });
+    const server = app.listen(PORT, () => {
+      console.log('=== Server Started ===');
+      console.log(`🌐 Dashboard: http://localhost:${PORT}`);
+      console.log(`📊 History: http://localhost:${PORT}/history`);
+      console.log(`🔧 API: http://localhost:${PORT}/api/stations`);
+      console.log(`⚡ Ingest: http://localhost:${PORT}/tasks/ingest?token=YOUR_TOKEN`);
+      console.log('========================');
+      
+      // Start automatic data refresh every 5 minutes
+      startAutomaticRefresh();
+    });
+
+    // Handle server errors
+    server.on('error', (error) => {
+      if (error.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use. Trying to find and kill existing process...`);
+        // Try to find and kill the process using the port
+        require('child_process').exec(`lsof -ti:${PORT}`, (err, stdout) => {
+          if (stdout) {
+            const pid = stdout.trim();
+            console.log(`Killing process ${pid} using port ${PORT}`);
+            process.kill(pid, 'SIGTERM');
+            setTimeout(() => {
+              console.log('Retrying server start...');
+              startServer();
+            }, 2000);
+          } else {
+            console.error('Could not find process using port', PORT);
+            process.exit(1);
+          }
+        });
+      } else {
+        console.error('Server error:', error);
+        process.exit(1);
+      }
+    });
+
+    // Graceful shutdown
+    const gracefulShutdown = () => {
+      console.log('Shutting down server gracefully...');
+      server.close(() => {
+        console.log('Server closed');
+        stopAutomaticRefresh();
+        process.exit(0);
+      });
+    };
+
+    process.on('SIGTERM', gracefulShutdown);
+    process.on('SIGINT', gracefulShutdown);
+
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
 }
 
 // Automatic data refresh functionality
@@ -129,6 +196,8 @@ function startAutomaticRefresh() {
       console.log(`✅ [${new Date().toISOString()}] Scheduled refresh completed successfully`);
     } catch (error) {
       console.error(`❌ [${new Date().toISOString()}] Scheduled refresh failed:`, error.message);
+      console.error('Error stack:', error.stack);
+      // Don't let ingestion errors crash the server
     }
   }, refreshIntervalMs);
 }
@@ -140,6 +209,8 @@ async function performInitialIngestion() {
     console.log('✅ Initial data ingestion completed successfully');
   } catch (error) {
     console.error('❌ Initial data ingestion failed:', error.message);
+    console.error('Error stack:', error.stack);
+    // Don't let initial ingestion failure crash the server
   }
 }
 
@@ -151,18 +222,7 @@ function stopAutomaticRefresh() {
   }
 }
 
-// Handle graceful shutdown
-process.on('SIGINT', () => {
-  console.log('\n=== Shutting down gracefully ===');
-  stopAutomaticRefresh();
-  process.exit(0);
-});
-
-process.on('SIGTERM', () => {
-  console.log('\n=== Shutting down gracefully ===');
-  stopAutomaticRefresh();
-  process.exit(0);
-});
+// Remove duplicate signal handlers (moved to startServer function)
 
 // Start the server
 startServer().catch(error => {

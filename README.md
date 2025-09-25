@@ -139,7 +139,39 @@ Once started, the application will be available at:
 
 ### Automatic Data Updates
 
-The application can be configured to automatically fetch new data. Set up a cron job or scheduled task to call the ingest endpoint periodically:
+The application automatically fetches new data every 5 minutes when running. For production deployments, you can set up the application as a system service:
+
+#### macOS Service Setup (Optional)
+
+1. **Copy the template plist file**:
+   ```bash
+   cp com.weatherstations.server.plist.template com.weatherstations.server.plist
+   ```
+
+2. **Edit the plist file** to replace `REPLACE_WITH_YOUR_PROJECT_PATH` with your actual project path:
+   ```bash
+   # Replace all instances of REPLACE_WITH_YOUR_PROJECT_PATH with your actual path
+   sed -i '' 's|REPLACE_WITH_YOUR_PROJECT_PATH|/Users/yourusername/Documents/WeatherStation|g' com.weatherstations.server.plist
+   ```
+
+3. **Install the service**:
+   ```bash
+   cp com.weatherstations.server.plist ~/Library/LaunchAgents/
+   launchctl load ~/Library/LaunchAgents/com.weatherstations.server.plist
+   ```
+
+4. **Manage the service**:
+   ```bash
+   # Check status
+   launchctl list | grep weatherstations
+   
+   # Unload service
+   launchctl unload ~/Library/LaunchAgents/com.weatherstations.server.plist
+   ```
+
+#### Manual Cron Job (Alternative)
+
+Set up a cron job to call the ingest endpoint periodically:
 
 ```bash
 # Example cron job (runs every 5 minutes)
