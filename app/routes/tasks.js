@@ -4,8 +4,7 @@ const datastore = require('../datastore');
 const { createClient, normalizeObservation } = require('../ambientClient');
 
 /**
- * GET /tasks/ingest
- * Protected ingestion endpoint that fetches data from AmbientWeather API
+ * Resolve station name from MAC address
  */
 function resolveStationName(mac, latestObservation) {
   const map = {
@@ -14,20 +13,14 @@ function resolveStationName(mac, latestObservation) {
   };
   return map[mac] || (latestObservation && (latestObservation.info?.name || latestObservation.stationtype)) || null;
 }
-router.get('/ingest', async (req, res) => {
+
+/**
+ * Core ingestion function that can be called from API endpoint or automatically
+ * @param {boolean} requireToken - Whether to require admin token validation
+ * @returns {Object} Summary of ingestion results
+ */
+async function performIngestion(requireToken = true) {
   try {
-    const { token } = req.query;
-    const adminToken = process.env.ADMIN_TOKEN;
-    
-    // Validate admin token
-    if (!adminToken) {
-      return res.status(500).json({ error: 'ADMIN_TOKEN not configured' });
-    }
-    
-    if (!token || token !== adminToken) {
-      return res.status(403).json({ error: 'Invalid or missing admin token' });
-    }
-    
     console.log('Starting data ingestion...');
     
     const client = createClient();
@@ -49,7 +42,7 @@ router.get('/ingest', async (req, res) => {
     }
     
     if (stationMacs.length === 0) {
-      return res.status(400).json({ error: 'No stations configured or discovered' });
+      throw new Error('No stations configured or discovered');
     }
     
     let totalStationsProcessed = 0;
@@ -110,6 +103,33 @@ router.get('/ingest', async (req, res) => {
     };
     
     console.log('Ingestion completed:', summary);
+    return summary;
+    
+  } catch (error) {
+    console.error('Error during ingestion:', error);
+    throw error;
+  }
+}
+
+/**
+ * GET /tasks/ingest
+ * Protected ingestion endpoint that fetches data from AmbientWeather API
+ */
+router.get('/ingest', async (req, res) => {
+  try {
+    const { token } = req.query;
+    const adminToken = process.env.ADMIN_TOKEN;
+    
+    // Validate admin token
+    if (!adminToken) {
+      return res.status(500).json({ error: 'ADMIN_TOKEN not configured' });
+    }
+    
+    if (!token || token !== adminToken) {
+      return res.status(403).json({ error: 'Invalid or missing admin token' });
+    }
+    
+    const summary = await performIngestion(true);
     res.json(summary);
     
   } catch (error) {
@@ -118,4 +138,7 @@ router.get('/ingest', async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = {
+  router,
+  performIngestion
+};

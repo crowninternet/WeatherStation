@@ -5,7 +5,7 @@ const datastore = require('./app/datastore');
 
 // Import routes
 const apiRoutes = require('./app/routes/api');
-const taskRoutes = require('./app/routes/tasks');
+const { router: taskRoutes, performIngestion } = require('./app/routes/tasks');
 
 const app = express();
 const PORT = process.env.PORT || 3333;
@@ -103,17 +103,64 @@ async function startServer() {
     console.log(`🔧 API: http://localhost:${PORT}/api/stations`);
     console.log(`⚡ Ingest: http://localhost:${PORT}/tasks/ingest?token=YOUR_TOKEN`);
     console.log('========================');
+    
+    // Start automatic data refresh every 5 minutes
+    startAutomaticRefresh();
   });
+}
+
+// Automatic data refresh functionality
+let refreshInterval = null;
+
+function startAutomaticRefresh() {
+  const refreshIntervalMinutes = 5; // Refresh every 5 minutes
+  const refreshIntervalMs = refreshIntervalMinutes * 60 * 1000;
+  
+  console.log(`🔄 Starting automatic data refresh every ${refreshIntervalMinutes} minutes`);
+  
+  // Perform initial ingestion on startup
+  performInitialIngestion();
+  
+  // Set up interval for regular refreshes
+  refreshInterval = setInterval(async () => {
+    try {
+      console.log(`🔄 [${new Date().toISOString()}] Starting scheduled data refresh...`);
+      await performIngestion(false); // Don't require token for automatic refresh
+      console.log(`✅ [${new Date().toISOString()}] Scheduled refresh completed successfully`);
+    } catch (error) {
+      console.error(`❌ [${new Date().toISOString()}] Scheduled refresh failed:`, error.message);
+    }
+  }, refreshIntervalMs);
+}
+
+async function performInitialIngestion() {
+  try {
+    console.log('🔄 Performing initial data ingestion on startup...');
+    await performIngestion(false); // Don't require token for automatic refresh
+    console.log('✅ Initial data ingestion completed successfully');
+  } catch (error) {
+    console.error('❌ Initial data ingestion failed:', error.message);
+  }
+}
+
+function stopAutomaticRefresh() {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
+    console.log('🛑 Automatic data refresh stopped');
+  }
 }
 
 // Handle graceful shutdown
 process.on('SIGINT', () => {
   console.log('\n=== Shutting down gracefully ===');
+  stopAutomaticRefresh();
   process.exit(0);
 });
 
 process.on('SIGTERM', () => {
   console.log('\n=== Shutting down gracefully ===');
+  stopAutomaticRefresh();
   process.exit(0);
 });
 
