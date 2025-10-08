@@ -47,7 +47,7 @@ fi
 
 # Test 2: Download and validate the installer script
 print_info "Downloading installer script..."
-INSTALLER_URL="https://raw.githubusercontent.com/crowninternet/WeatherStation/main/proxmox/fresh-install.sh"
+INSTALLER_URL="https://raw.githubusercontent.com/crowninternet/WeatherStation/main/proxmox/fresh-install-v2.sh"
 TEMP_SCRIPT="/tmp/weatherstation-installer-test.sh"
 
 if curl -fsSL "$INSTALLER_URL" -o "$TEMP_SCRIPT"; then
@@ -129,11 +129,11 @@ echo ""
 print_success "All tests passed! The installer is ready for deployment."
 echo ""
 print_info "To deploy on a Proxmox host, run:"
-echo "curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/proxmox/fresh-install.sh | bash"
+echo "curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/proxmox/fresh-install-v2.sh | bash"
 echo ""
 print_info "Or download first:"
-echo "wget https://raw.githubusercontent.com/crowninternet/WeatherStation/main/proxmox/fresh-install.sh"
-echo "chmod +x fresh-install.sh"
-echo "./fresh-install.sh"
+echo "wget https://raw.githubusercontent.com/crowninternet/WeatherStation/main/proxmox/fresh-install-v2.sh"
+echo "chmod +x fresh-install-v2.sh"
+echo "./fresh-install-v2.sh"
 echo ""
 print_success "Installation script validation complete!"

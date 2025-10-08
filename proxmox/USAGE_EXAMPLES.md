@@ -5,19 +5,19 @@
 ### Method 1: Direct Download and Execute
 ```bash
 # Download and run the installer directly from GitHub
-curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/proxmox/fresh-install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/proxmox/fresh-install-v2.sh | bash
 ```
 
 ### Method 2: Download First, Then Execute
 ```bash
 # Download the script to your Proxmox host
-wget https://raw.githubusercontent.com/crowninternet/WeatherStation/main/proxmox/fresh-install.sh
+wget https://raw.githubusercontent.com/crowninternet/WeatherStation/main/proxmox/fresh-install-v2.sh
 
 # Make it executable
-chmod +x fresh-install.sh
+chmod +x fresh-install-v2.sh
 
 # Run the installer
-./fresh-install.sh
+./fresh-install-v2.sh
 ```
 
 ### Method 3: Clone Repository (if you need multiple files)
@@ -27,7 +27,7 @@ git clone https://github.com/crowninternet/WeatherStation.git
 cd WeatherStation/proxmox
 
 # Run the installer
-./fresh-install.sh
+./fresh-install-v2.sh
 ```
 
 ## 📋 Installation Process
@@ -42,7 +42,7 @@ When you run the installer, you'll be prompted for:
 
 ### Example Installation Session:
 ```bash
-$ ./fresh-install.sh
+$ ./fresh-install-v2.sh
 
 ================================
 WeatherStation - Fresh Install
