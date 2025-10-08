@@ -10,7 +10,7 @@
 # 4. Configure systemd service
 # 5. Start monitoring automatically
 #
-# Usage: ./fresh-install.sh
+# Usage: ./fresh-install-v2.sh
 ################################################################################
 
 set -e
