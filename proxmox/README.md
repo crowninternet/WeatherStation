@@ -4,7 +4,7 @@ This folder contains all the necessary files and documentation for deploying the
 
 ## Files
 
-- `fresh-install-v3.sh` - Automated installation script for Proxmox (Version 3)
+- `fresh-install-v4.sh` - Automated installation script for Proxmox (Version 4)
 - `DEPLOYMENT_GUIDE.md` - Comprehensive deployment guide
 - `README.md` - This file
 
@@ -12,7 +12,7 @@ This folder contains all the necessary files and documentation for deploying the
 
 1. **Run the installation script** from your Proxmox host:
 ```bash
-./fresh-install-v3.sh
+./fresh-install-v4.sh
 ```
 
 2. **Follow the prompts** to configure your container
