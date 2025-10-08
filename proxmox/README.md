@@ -6,6 +6,7 @@ This folder contains all the necessary files and documentation for deploying the
 
 - `fresh-install-v5.sh` - Automated installation script for Proxmox (Version 5)
 - `DEPLOYMENT_GUIDE.md` - Comprehensive deployment guide
+- `TROUBLESHOOTING.md` - Common issues and solutions
 - `README.md` - This file
 
 ## Quick Start
