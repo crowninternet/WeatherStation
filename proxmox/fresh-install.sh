@@ -1,6 +1,6 @@
 #!/bin/bash
 ################################################################################
-# WeatherStation - Fresh Installation Script for Proxmox (FIXED VERSION)
+# WeatherStation - Fresh Installation Script for Proxmox
 # Run this script from the Proxmox HOST (not in a container)
 #
 # This script will:
@@ -13,7 +13,7 @@
 # Usage: ./fresh-install.sh
 ################################################################################
 
-set -euo pipefail
+set -e
 
 # Colors
 RED='\033[0;31m'
@@ -49,7 +49,6 @@ print_header() {
 # Check if running on Proxmox host
 if ! command -v pct &> /dev/null; then
     print_error "This script must be run from a Proxmox host"
-    print_info "Make sure you're running this from the Proxmox host, not inside a container"
     exit 1
 fi
 
@@ -64,20 +63,12 @@ APP_USER="weatherstation"
 
 # Ask for container configuration
 read -p "Enter container ID (e.g., 100): " CONTAINER_ID
-if [ -z "$CONTAINER_ID" ]; then
-    print_error "Container ID cannot be empty"
-    exit 1
-fi
-
 read -p "Enter hostname [weatherstation]: " HOSTNAME
 HOSTNAME=${HOSTNAME:-weatherstation}
-
 read -p "Enter disk size in GB [4]: " DISK_SIZE
 DISK_SIZE=${DISK_SIZE:-4}
-
 read -p "Enter RAM in MB [512]: " RAM
 RAM=${RAM:-512}
-
 read -p "Enter storage pool [local-lxc]: " STORAGE
 STORAGE=${STORAGE:-local-lxc}
 
@@ -89,7 +80,7 @@ echo "  RAM: ${RAM}MB"
 echo "  Storage: $STORAGE"
 echo ""
 read -p "Continue? (y/N): " -n 1 -r
-echo ""
+echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     print_info "Installation cancelled"
     exit 0
@@ -171,44 +162,85 @@ echo ""
 print_info "Creating application directory..."
 pct exec $CONTAINER_ID -- mkdir -p $INSTALL_DIR
 pct exec $CONTAINER_ID -- mkdir -p $INSTALL_DIR/data
-pct exec $CONTAINER_ID -- mkdir -p $INSTALL_DIR/app/routes
-pct exec $CONTAINER_ID -- mkdir -p $INSTALL_DIR/app/utils
-pct exec $CONTAINER_ID -- mkdir -p $INSTALL_DIR/public/assets
 
 print_info "Downloading application files..."
-
-# Download main server file
 pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/server.js -o server.js"
 if [ $? -ne 0 ]; then
     print_error "Failed to download server.js"
     exit 1
 fi
 
-# Download package.json
 pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/package.json -o package.json"
 if [ $? -ne 0 ]; then
     print_error "Failed to download package.json"
     exit 1
 fi
 
-# Download app files
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/datastore.js -o app/datastore.js"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/ambientClient.js -o app/ambientClient.js"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/mutex.js -o app/mutex.js"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/datastore.js -o datastore.js"
+if [ $? -ne 0 ]; then
+    print_error "Failed to download datastore.js"
+    exit 1
+fi
 
-# Download route files
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/routes/api.js -o app/routes/api.js"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/routes/tasks.js -o app/routes/tasks.js"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/ambientClient.js -o ambientClient.js"
+if [ $? -ne 0 ]; then
+    print_error "Failed to download ambientClient.js"
+    exit 1
+fi
 
-# Download utility files
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/utils/csv.js -o app/utils/csv.js"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/utils/dates.js -o app/utils/dates.js"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/mutex.js -o mutex.js"
+if [ $? -ne 0 ]; then
+    print_error "Failed to download mutex.js"
+    exit 1
+fi
 
-# Download public files
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/index.html -o public/index.html"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/history.html -o public/history.html"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/assets/app.css -o public/assets/app.css"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/assets/app.js -o public/assets/app.js"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/routes/api.js -o api.js"
+if [ $? -ne 0 ]; then
+    print_error "Failed to download api.js"
+    exit 1
+fi
+
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/routes/tasks.js -o tasks.js"
+if [ $? -ne 0 ]; then
+    print_error "Failed to download tasks.js"
+    exit 1
+fi
+
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/utils/csv.js -o csv.js"
+if [ $? -ne 0 ]; then
+    print_error "Failed to download csv.js"
+    exit 1
+fi
+
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/utils/dates.js -o dates.js"
+if [ $? -ne 0 ]; then
+    print_error "Failed to download dates.js"
+    exit 1
+fi
+
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/index.html -o index.html"
+if [ $? -ne 0 ]; then
+    print_error "Failed to download index.html"
+    exit 1
+fi
+
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/history.html -o history.html"
+if [ $? -ne 0 ]; then
+    print_error "Failed to download history.html"
+    exit 1
+fi
+
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/assets/app.css -o app.css"
+if [ $? -ne 0 ]; then
+    print_error "Failed to download app.css"
+    exit 1
+fi
+
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/assets/app.js -o app.js"
+if [ $? -ne 0 ]; then
+    print_error "Failed to download app.js"
+    exit 1
+fi
 
 print_success "Files downloaded"
 
@@ -226,17 +258,22 @@ print_info "Setting permissions..."
 pct exec $CONTAINER_ID -- chown -R $APP_USER:$APP_USER $INSTALL_DIR
 pct exec $CONTAINER_ID -- chmod 755 $INSTALL_DIR
 pct exec $CONTAINER_ID -- chmod 755 $INSTALL_DIR/data
-pct exec $CONTAINER_ID -- chmod 755 $INSTALL_DIR/app
-pct exec $CONTAINER_ID -- chmod 755 $INSTALL_DIR/app/routes
-pct exec $CONTAINER_ID -- chmod 755 $INSTALL_DIR/app/utils
-pct exec $CONTAINER_ID -- chmod 755 $INSTALL_DIR/public
-pct exec $CONTAINER_ID -- chmod 755 $INSTALL_DIR/public/assets
 
 # Set permissions for files that exist
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && find . -name '*.js' -exec chmod 644 {} \;"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && find . -name '*.html' -exec chmod 644 {} \;"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && find . -name '*.css' -exec chmod 644 {} \;"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && find . -name '*.json' -exec chmod 644 {} \;"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f server.js ] && chmod 644 server.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f package.json ] && chmod 644 package.json || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f datastore.js ] && chmod 644 datastore.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f ambientClient.js ] && chmod 644 ambientClient.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f mutex.js ] && chmod 644 mutex.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f api.js ] && chmod 644 api.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f tasks.js ] && chmod 644 tasks.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f csv.js ] && chmod 644 csv.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f dates.js ] && chmod 644 dates.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f index.html ] && chmod 644 index.html || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f history.html ] && chmod 644 history.html || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f app.css ] && chmod 644 app.css || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f app.js ] && chmod 644 app.js || true"
+pct exec $CONTAINER_ID -- chmod 644 $INSTALL_DIR/data/*.json
 
 print_success "Permissions set"
 
@@ -323,11 +360,20 @@ echo ""
 print_info "Waiting for service to initialize..."
 sleep 5
 
-print_info "Checking health endpoint..."
+print_info "Checking API health..."
 if pct exec $CONTAINER_ID -- curl -s http://localhost:3333/health > /dev/null 2>&1; then
-    print_success "WeatherStation is responding!"
+    print_success "API is responding"
 else
-    print_warning "Service not responding yet (may still be starting)"
+    print_warning "API not responding yet (may still be starting)"
+fi
+
+print_info "Checking weather data ingestion..."
+WEATHER_STATUS=$(pct exec $CONTAINER_ID -- curl -s http://localhost:3333/api/stations 2>/dev/null)
+if echo "$WEATHER_STATUS" | grep -q '"stations"'; then
+    print_success "Weather data API is active!"
+    echo "$WEATHER_STATUS" | python3 -m json.tool 2>/dev/null || echo "$WEATHER_STATUS"
+else
+    print_warning "Weather API not responding yet (may need configuration)"
 fi
 
 echo ""
@@ -349,45 +395,25 @@ echo "  Container ID: $CONTAINER_ID"
 echo "  Hostname: $HOSTNAME"
 echo "  IP Address: $CONTAINER_IP"
 echo "  Web Interface: http://$CONTAINER_IP:3333"
-echo "  Health Check: http://$CONTAINER_IP:3333/health"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo " 📝 Management Commands"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "  Start:   pct exec $CONTAINER_ID -- systemctl start $SERVICE_NAME"
-echo "  Stop:    pct exec $CONTAINER_ID -- systemctl stop $SERVICE_NAME"
+echo "  Start: pct exec $CONTAINER_ID -- systemctl start $SERVICE_NAME"
+echo "  Stop: pct exec $CONTAINER_ID -- systemctl stop $SERVICE_NAME"
 echo "  Restart: pct exec $CONTAINER_ID -- systemctl restart $SERVICE_NAME"
-echo "  Status:  pct exec $CONTAINER_ID -- systemctl status $SERVICE_NAME"
-echo "  Logs:    pct exec $CONTAINER_ID -- journalctl -u $SERVICE_NAME -f"
-echo "  Enter:   pct enter $CONTAINER_ID"
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo " ⚙️  Configuration Required"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-echo " 1. Create .env file with your AmbientWeather API credentials:"
-echo "    pct exec $CONTAINER_ID -- bash -c \"cat > $INSTALL_DIR/.env << 'ENVEOF'"
-echo "    AMBIENT_API_KEY=your_api_key_here"
-echo "    AMBIENT_APP_KEY=your_application_key_here"
-echo "    ADMIN_TOKEN=your_secure_token_here"
-echo "    PORT=3333"
-echo "    TIMEZONE=America/New_York"
-echo "    ENVEOF\""
-echo ""
-echo " 2. Restart the service after configuration:"
-echo "    pct exec $CONTAINER_ID -- systemctl restart $SERVICE_NAME"
-echo ""
-echo " 3. Trigger initial data ingestion:"
-echo "    curl \"http://$CONTAINER_IP:3333/tasks/ingest?token=YOUR_ADMIN_TOKEN\""
+echo "  Status: pct exec $CONTAINER_ID -- systemctl status $SERVICE_NAME"
+echo "  Logs: pct exec $CONTAINER_ID -- journalctl -u $SERVICE_NAME -f"
+echo "  Enter Container: pct enter $CONTAINER_ID"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo " ✨ Features Enabled"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo " ✅ Real-time weather dashboard"
+echo " ✅ Real-time weather dashboard (24/7)"
 echo " ✅ Historical data charts"
-echo " ✅ Automatic data ingestion"
+echo " ✅ Automatic data ingestion from AmbientWeather API"
 echo " ✅ Responsive web interface"
 echo " ✅ Auto-restart on failure"
 echo " ✅ Survives container reboots"
@@ -398,8 +424,9 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 echo " 1. Open http://$CONTAINER_IP:3333 in your browser"
 echo " 2. Configure your AmbientWeather API credentials"
-echo " 3. Trigger initial data ingestion"
-echo " 4. View your weather dashboard!"
+echo " 3. Add your weather stations to monitor"
+echo " 4. Trigger initial data ingestion"
+echo " 5. View your weather dashboard!"
 echo ""
-print_info "WeatherStation will run 24/7 in the background!"
+print_info "Weather monitoring will run 24/7 in the background!"
 echo ""
