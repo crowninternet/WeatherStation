@@ -1,6 +1,6 @@
 #!/bin/bash
 ################################################################################
-# WeatherStation - Fresh Installation Script for Proxmox
+# WeatherStation - Fresh Installation Script for Proxmox (FIXED VERSION)
 # Run this script from the Proxmox HOST (not in a container)
 #
 # This script will:
