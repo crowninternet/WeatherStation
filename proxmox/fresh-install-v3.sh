@@ -258,7 +258,7 @@ pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f index.html ] && chmod
 pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f history.html ] && chmod 644 history.html || true"
 pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f app.css ] && chmod 644 app.css || true"
 pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f app.js ] && chmod 644 app.js || true"
-pct exec $CONTAINER_ID -- chmod 644 $INSTALL_DIR/data/*.json
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR/data && [ -f data.json ] && chmod 644 data.json || true"
 
 print_success "Permissions set"
 
