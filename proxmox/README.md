@@ -4,7 +4,7 @@ This folder contains all the necessary files and documentation for deploying the
 
 ## Files
 
-- `fresh-install-v5.sh` - Automated installation script for Proxmox (Version 5)
+- `fresh-install-v6.sh` - Automated installation script for Proxmox (Version 6)
 - `DEPLOYMENT_GUIDE.md` - Comprehensive deployment guide
 - `TROUBLESHOOTING.md` - Common issues and solutions
 - `README.md` - This file
@@ -13,7 +13,7 @@ This folder contains all the necessary files and documentation for deploying the
 
 1. **Run the installation script** from your Proxmox host:
 ```bash
-./fresh-install-v5.sh
+./fresh-install-v6.sh
 ```
 
 2. **Follow the prompts** to configure your container
