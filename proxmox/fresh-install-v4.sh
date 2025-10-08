@@ -147,6 +147,9 @@ echo ""
 print_info "Creating application directory..."
 pct exec $CONTAINER_ID -- mkdir -p $INSTALL_DIR
 pct exec $CONTAINER_ID -- mkdir -p $INSTALL_DIR/data
+pct exec $CONTAINER_ID -- mkdir -p $INSTALL_DIR/app/routes
+pct exec $CONTAINER_ID -- mkdir -p $INSTALL_DIR/app/utils
+pct exec $CONTAINER_ID -- mkdir -p $INSTALL_DIR/public/assets
 
 print_info "Downloading application files..."
 pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/server.js -o server.js"
@@ -161,67 +164,67 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/datastore.js -o datastore.js"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/datastore.js -o app/datastore.js"
 if [ $? -ne 0 ]; then
     print_error "Failed to download datastore.js"
     exit 1
 fi
 
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/ambientClient.js -o ambientClient.js"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/ambientClient.js -o app/ambientClient.js"
 if [ $? -ne 0 ]; then
     print_error "Failed to download ambientClient.js"
     exit 1
 fi
 
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/mutex.js -o mutex.js"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/mutex.js -o app/mutex.js"
 if [ $? -ne 0 ]; then
     print_error "Failed to download mutex.js"
     exit 1
 fi
 
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/routes/api.js -o api.js"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/routes/api.js -o app/routes/api.js"
 if [ $? -ne 0 ]; then
     print_error "Failed to download api.js"
     exit 1
 fi
 
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/routes/tasks.js -o tasks.js"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/routes/tasks.js -o app/routes/tasks.js"
 if [ $? -ne 0 ]; then
     print_error "Failed to download tasks.js"
     exit 1
 fi
 
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/utils/csv.js -o csv.js"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/utils/csv.js -o app/utils/csv.js"
 if [ $? -ne 0 ]; then
     print_error "Failed to download csv.js"
     exit 1
 fi
 
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/utils/dates.js -o dates.js"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/app/utils/dates.js -o app/utils/dates.js"
 if [ $? -ne 0 ]; then
     print_error "Failed to download dates.js"
     exit 1
 fi
 
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/index.html -o index.html"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/index.html -o public/index.html"
 if [ $? -ne 0 ]; then
     print_error "Failed to download index.html"
     exit 1
 fi
 
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/history.html -o history.html"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/history.html -o public/history.html"
 if [ $? -ne 0 ]; then
     print_error "Failed to download history.html"
     exit 1
 fi
 
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/assets/app.css -o app.css"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/assets/app.css -o public/assets/app.css"
 if [ $? -ne 0 ]; then
     print_error "Failed to download app.css"
     exit 1
 fi
 
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/assets/app.js -o app.js"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && curl -fsSL https://raw.githubusercontent.com/crowninternet/WeatherStation/main/public/assets/app.js -o public/assets/app.js"
 if [ $? -ne 0 ]; then
     print_error "Failed to download app.js"
     exit 1
@@ -243,21 +246,26 @@ print_info "Setting permissions..."
 pct exec $CONTAINER_ID -- chown -R $APP_USER:$APP_USER $INSTALL_DIR
 pct exec $CONTAINER_ID -- chmod 755 $INSTALL_DIR
 pct exec $CONTAINER_ID -- chmod 755 $INSTALL_DIR/data
+pct exec $CONTAINER_ID -- chmod 755 $INSTALL_DIR/app
+pct exec $CONTAINER_ID -- chmod 755 $INSTALL_DIR/app/routes
+pct exec $CONTAINER_ID -- chmod 755 $INSTALL_DIR/app/utils
+pct exec $CONTAINER_ID -- chmod 755 $INSTALL_DIR/public
+pct exec $CONTAINER_ID -- chmod 755 $INSTALL_DIR/public/assets
 
 # Set permissions for files that exist
 pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f server.js ] && chmod 644 server.js || true"
 pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f package.json ] && chmod 644 package.json || true"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f datastore.js ] && chmod 644 datastore.js || true"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f ambientClient.js ] && chmod 644 ambientClient.js || true"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f mutex.js ] && chmod 644 mutex.js || true"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f api.js ] && chmod 644 api.js || true"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f tasks.js ] && chmod 644 tasks.js || true"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f csv.js ] && chmod 644 csv.js || true"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f dates.js ] && chmod 644 dates.js || true"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f index.html ] && chmod 644 index.html || true"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f history.html ] && chmod 644 history.html || true"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f app.css ] && chmod 644 app.css || true"
-pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f app.js ] && chmod 644 app.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f app/datastore.js ] && chmod 644 app/datastore.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f app/ambientClient.js ] && chmod 644 app/ambientClient.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f app/mutex.js ] && chmod 644 app/mutex.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f app/routes/api.js ] && chmod 644 app/routes/api.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f app/routes/tasks.js ] && chmod 644 app/routes/tasks.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f app/utils/csv.js ] && chmod 644 app/utils/csv.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f app/utils/dates.js ] && chmod 644 app/utils/dates.js || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f public/index.html ] && chmod 644 public/index.html || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f public/history.html ] && chmod 644 public/history.html || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f public/assets/app.css ] && chmod 644 public/assets/app.css || true"
+pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR && [ -f public/assets/app.js ] && chmod 644 public/assets/app.js || true"
 pct exec $CONTAINER_ID -- bash -c "cd $INSTALL_DIR/data && [ -f data.json ] && chmod 644 data.json || true"
 
 print_success "Permissions set"
