@@ -13,7 +13,7 @@
 # Usage: ./fresh-install.sh
 ################################################################################
 
-set -e
+set -euo pipefail
 
 # Colors
 RED='\033[0;31m'
@@ -49,6 +49,7 @@ print_header() {
 # Check if running on Proxmox host
 if ! command -v pct &> /dev/null; then
     print_error "This script must be run from a Proxmox host"
+    print_info "Make sure you're running this from the Proxmox host, not inside a container"
     exit 1
 fi
 
@@ -63,12 +64,20 @@ APP_USER="weatherstation"
 
 # Ask for container configuration
 read -p "Enter container ID (e.g., 100): " CONTAINER_ID
+if [ -z "$CONTAINER_ID" ]; then
+    print_error "Container ID cannot be empty"
+    exit 1
+fi
+
 read -p "Enter hostname [weatherstation]: " HOSTNAME
 HOSTNAME=${HOSTNAME:-weatherstation}
+
 read -p "Enter disk size in GB [4]: " DISK_SIZE
 DISK_SIZE=${DISK_SIZE:-4}
+
 read -p "Enter RAM in MB [512]: " RAM
 RAM=${RAM:-512}
+
 read -p "Enter storage pool [local-lxc]: " STORAGE
 STORAGE=${STORAGE:-local-lxc}
 
@@ -80,7 +89,7 @@ echo "  RAM: ${RAM}MB"
 echo "  Storage: $STORAGE"
 echo ""
 read -p "Continue? (y/N): " -n 1 -r
-echo
+echo ""
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     print_info "Installation cancelled"
     exit 0
